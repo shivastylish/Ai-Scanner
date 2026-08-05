@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import pandas as pd
+from sqlalchemy.util import symbol
 import yfinance as yf
 
+from ai_screener.market_data.normalization.yahoo_normalizer import YahooNormalizer
 from ai_screener.market_data.providers import MarketDataProvider
 
 
@@ -34,7 +36,11 @@ class YahooFinanceProvider(MarketDataProvider):
 
         df = df.reset_index()
 
-        return df
+        from ai_screener.market_data.normalization.yahoo_normalizer import (YahooNormalizer,)
+
+        normalizer = YahooNormalizer()
+
+        return normalizer.normalize(df, symbol)
 
     def validate_symbol(self, symbol: str) -> bool:
         try:
