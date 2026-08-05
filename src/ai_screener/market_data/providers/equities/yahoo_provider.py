@@ -5,6 +5,7 @@ from sqlalchemy.util import symbol
 import yfinance as yf
 
 from ai_screener.market_data.normalization.yahoo_normalizer import YahooNormalizer
+from ai_screener.market_data.pipeline.pipeline import MarketDataPipeline
 from ai_screener.market_data.providers import MarketDataProvider
 
 
@@ -40,7 +41,11 @@ class YahooFinanceProvider(MarketDataProvider):
 
         normalizer = YahooNormalizer()
 
-        return normalizer.normalize(df, symbol)
+        from ai_screener.market_data.pipeline import MarketDataPipeline
+
+        normalized = normalizer.normalize(df, symbol)
+
+        return MarketDataPipeline.process(normalized)
 
     def validate_symbol(self, symbol: str) -> bool:
         try:
