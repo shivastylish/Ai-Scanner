@@ -1,1 +1,5 @@
 2026-08-05 20:45:16,372 | INFO | __main__ | AI Screener started successfully.
+2026-08-06 22:59:59,421 | INFO | ai_screener.market_data.services.market_data_service | Downloading equity data for RELIANCE.NS
+2026-08-06 23:00:09,353 | INFO | ai_screener.market_data.services.market_data_service | Downloaded 7 rows for RELIANCE.NS
+2026-08-06 23:01:51,740 | INFO | ai_screener.market_data.services.market_data_service | Downloading equity data for RELIANCE.NS
+2026-08-06 23:01:52,501 | INFO | ai_screener.market_data.services.market_data_service | Downloaded 7 rows for RELIANCE.NS

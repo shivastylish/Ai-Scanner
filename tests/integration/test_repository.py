@@ -1,5 +1,5 @@
 from ai_screener.market_data.providers.equities import YahooFinanceProvider
-from ai_screener.market_data.persistence.market_data_repository import (
+from ai_screener.market_data.repositories.market_data_repository import (
     MarketDataRepository,
 )
 
@@ -16,8 +16,6 @@ def test_save_market_data():
         "2025-01-05",
     )
 
-    records = mapper.to_records(df)
-
-    persistence.save(records)
+    repo.save(df)
 
     assert repo.count() > 0
