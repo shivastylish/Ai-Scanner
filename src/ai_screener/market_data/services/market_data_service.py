@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 from ai_screener.core import get_logger
 from ai_screener.market_data.providers import ProviderFactory
@@ -14,8 +14,8 @@ logger = get_logger(__name__)
 class MarketDataService:
     """Service responsible for orchestrating market data operations."""
 
-    def __init__(self) -> None:
-        self._repository = MarketDataRepository()
+    def __init__(self, repository: MarketDataRepository | None = None) -> None:
+        self._repository = repository or MarketDataRepository()
 
     def download(
         self,
@@ -41,7 +41,8 @@ class MarketDataService:
         )
 
         if save:
-            self._repository.save(df)
+            inserted_count = self._repository.save(df)
+            logger.info("Persisted %d rows for %s", inserted_count, symbol)
 
         logger.info(
             "Downloaded %d rows for %s",

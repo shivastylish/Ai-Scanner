@@ -1,4 +1,4 @@
-import pandas as pd
+import pandas as pd  # type: ignore[import-untyped]
 
 from .market_data_record import MarketDataRecord
 
@@ -6,7 +6,7 @@ from .market_data_record import MarketDataRecord
 class MarketDataMapper:
 
     @staticmethod
-    def from_dataframe(df: pd.DataFrame):
+    def from_dataframe(df: pd.DataFrame) -> list[MarketDataRecord]:
 
         return [
             MarketDataRecord(**row)

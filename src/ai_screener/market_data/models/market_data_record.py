@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime as dt_datetime
 
 from pydantic import BaseModel
 
@@ -8,7 +8,7 @@ from .schema import AssetType
 class MarketDataRecord(BaseModel):
     symbol: str
 
-    datetime: datetime
+    datetime: dt_datetime
 
     open: float
     high: float
@@ -23,5 +23,5 @@ class MarketDataRecord(BaseModel):
     exchange: str
     currency: str
 
-    created_at: datetime
-    updated_at: datetime
+    created_at: dt_datetime
+    updated_at: dt_datetime

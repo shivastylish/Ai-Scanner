@@ -1,6 +1,6 @@
-from datetime import datetime
+from datetime import datetime as dt_datetime
 
-from sqlalchemy import DateTime, Float, Integer, String
+from sqlalchemy import DateTime, Float, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -13,7 +13,7 @@ class MarketData(Base):
 
     symbol: Mapped[str] = mapped_column(String(30), index=True)
 
-    datetime: Mapped[datetime] = mapped_column(DateTime, index=True)
+    datetime: Mapped[dt_datetime] = mapped_column(DateTime, index=True)
 
     open: Mapped[float] = mapped_column(Float)
     high: Mapped[float] = mapped_column(Float)
@@ -27,5 +27,14 @@ class MarketData(Base):
     exchange: Mapped[str] = mapped_column(String(20))
     currency: Mapped[str] = mapped_column(String(10))
 
-    created_at: Mapped[datetime] = mapped_column(DateTime)
-    updated_at: Mapped[datetime] = mapped_column(DateTime)
+    created_at: Mapped[dt_datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+        default=dt_datetime.utcnow,
+    )
+    updated_at: Mapped[dt_datetime] = mapped_column(
+        DateTime,
+        server_default=func.now(),
+        onupdate=func.now(),
+        default=dt_datetime.utcnow,
+    )
