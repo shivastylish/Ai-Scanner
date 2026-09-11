@@ -1,16 +1,19 @@
 from __future__ import annotations
 
 import pandas as pd
-from sqlalchemy.util import symbol
 import yfinance as yf
 
-from ai_screener.market_data.normalization.yahoo_normalizer import YahooNormalizer
-from ai_screener.market_data.pipeline.pipeline import MarketDataPipeline
+from ai_screener.core.exceptions import ProviderError
 from ai_screener.market_data.providers import MarketDataProvider
 
 
 class YahooFinanceProvider(MarketDataProvider):
-    """Yahoo Finance implementation."""
+    """Yahoo Finance implementation.
+
+    Responsible only for fetching raw historical data from Yahoo Finance.
+    Normalization, validation, and enrichment are handled by the
+    Normalizer and Pipeline layers, orchestrated by the MarketDataService.
+    """
 
     @property
     def provider_name(self) -> str:
@@ -22,30 +25,24 @@ class YahooFinanceProvider(MarketDataProvider):
         start_date: str | None = None,
         end_date: str | None = None,
     ) -> pd.DataFrame:
+        try:
+            ticker = yf.Ticker(symbol)
 
-        ticker = yf.Ticker(symbol)
-
-        df = ticker.history(
-            start=start_date,
-            end=end_date,
-            auto_adjust=False,
-            actions=True,
-        )
+            df: pd.DataFrame = ticker.history(
+                start=start_date,
+                end=end_date,
+                auto_adjust=False,
+                actions=True,
+            )
+        except Exception as exc:  # pragma: no cover - network/library errors
+            raise ProviderError(
+                f"Failed to download history for '{symbol}' from Yahoo Finance."
+            ) from exc
 
         if df.empty:
-            raise ValueError(f"No market data found for '{symbol}'")
+            raise ProviderError(f"No market data found for '{symbol}'.")
 
-        df = df.reset_index()
-
-        from ai_screener.market_data.normalization.yahoo_normalizer import (YahooNormalizer,)
-
-        normalizer = YahooNormalizer()
-
-        from ai_screener.market_data.pipeline import MarketDataPipeline
-
-        normalized = normalizer.normalize(df, symbol)
-
-        return MarketDataPipeline.process(normalized)
+        return df.reset_index()
 
     def validate_symbol(self, symbol: str) -> bool:
         try:

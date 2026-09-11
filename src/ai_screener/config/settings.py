@@ -20,16 +20,29 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = Field(default="INFO")
 
-    DATABASE_URL: str = Field(
-        default="sqlite:///data/ai_screener.db"
-    )
+    DATABASE_URL: str = Field(default="sqlite:///data/ai_screener.db")
 
     DEFAULT_EQUITY_PROVIDER: str = "yahoo"
     DEFAULT_MUTUAL_FUND_PROVIDER: str = "mfapi"
+    #: Used when a caller asks for asset_type="crypto" without naming a
+    #: specific exchange (see ProviderFactory.get_provider). Individual
+    #: exchanges are still reachable by name (provider_name="binance",
+    #: etc.) regardless of this default.
+    DEFAULT_CRYPTO_PROVIDER: str = "coingecko"
 
     ENABLE_YAHOO: bool = True
     ENABLE_MFAPI: bool = True
-    ENABLE_COINGECKO: bool = False
+    ENABLE_COINGECKO: bool = True
+    ENABLE_BINANCE: bool = True
+    ENABLE_BYBIT: bool = True
+    ENABLE_KUCOIN: bool = True
+    #: Off by default: the free tier still requires an API key
+    #: (COINMARKETCAP_API_KEY) that most installs won't have configured.
+    ENABLE_COINMARKETCAP: bool = False
+
+    COINMARKETCAP_API_KEY: str = Field(default="")
+
+    JOURNAL_SCREENSHOTS_DIR: str = Field(default="data/journal_screenshots")
 
 
 @lru_cache

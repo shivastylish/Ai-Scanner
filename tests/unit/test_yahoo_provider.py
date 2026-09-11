@@ -1,10 +1,14 @@
+from __future__ import annotations
+
+import pytest
+
+from ai_screener.market_data.providers import ProviderRegistry
 from ai_screener.market_data.providers.bootstrap import (
     register_default_providers,
 )
-from ai_screener.market_data.providers import ProviderRegistry
 
 
-def test_provider_registration():
+def test_provider_registration() -> None:
     register_default_providers()
 
     provider = ProviderRegistry.get("equity")
@@ -12,7 +16,8 @@ def test_provider_registration():
     assert provider.provider_name == "yahoo"
 
 
-def test_health_check():
+@pytest.mark.live
+def test_health_check_reaches_live_yahoo_finance() -> None:
     register_default_providers()
 
     provider = ProviderRegistry.get("equity")

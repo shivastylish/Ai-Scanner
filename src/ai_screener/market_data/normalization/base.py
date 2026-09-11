@@ -10,5 +10,4 @@ class DataNormalizer(ABC):
         self,
         df: pd.DataFrame,
         symbol: str,
-    ) -> pd.DataFrame:
-        ...
+    ) -> pd.DataFrame: ...

@@ -12,3 +12,6 @@ class MutualFundProvider(StrEnum):
 class CryptoProvider(StrEnum):
     COINGECKO = "coingecko"
     COINMARKETCAP = "coinmarketcap"
+    BINANCE = "binance"
+    BYBIT = "bybit"
+    KUCOIN = "kucoin"

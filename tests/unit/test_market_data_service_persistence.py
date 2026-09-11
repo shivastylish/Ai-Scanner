@@ -1,80 +1,54 @@
 from __future__ import annotations
 
-from datetime import datetime
+from fakes.fake_provider import FakeEquityProvider
 
-import pandas as pd
-
-from ai_screener.market_data.providers import ProviderFactory
+from ai_screener.market_data.repositories.market_data_repository import (
+    MarketDataRepository,
+)
 from ai_screener.market_data.services import MarketDataService
 
 
-class StubRepository:
-    def __init__(self) -> None:
-        self.saved_frame: pd.DataFrame | None = None
+def test_download_history_persists_when_save_enabled(
+    service: MarketDataService,
+    repository: MarketDataRepository,
+) -> None:
+    result = service.download_history(symbol="RELIANCE.NS")
 
-    def save(self, df: pd.DataFrame) -> int:
-        self.saved_frame = df.copy()
-        return len(df)
-
-    def count(self) -> int:
-        return 0
+    assert len(result) > 0
+    assert repository.count() == len(result)
 
 
-class StubProvider:
-    def download_history(
-        self,
-        symbol: str,
-        start_date: str | None = None,
-        end_date: str | None = None,
-    ) -> pd.DataFrame:
-        return pd.DataFrame(
-            [
-                {
-                    "symbol": symbol,
-                    "datetime": datetime(2025, 1, 1, 9, 15, 0),
-                    "open": 100.0,
-                    "high": 110.0,
-                    "low": 95.0,
-                    "close": 108.0,
-                    "volume": 1200.0,
-                    "asset_type": "equity",
-                    "provider": "stub",
-                    "exchange": "NSE",
-                    "currency": "INR",
-                    "created_at": datetime(2025, 1, 1, 9, 15, 0),
-                    "updated_at": datetime(2025, 1, 1, 9, 15, 0),
-                }
-            ]
-        )
+def test_download_history_skips_persistence_when_save_disabled(
+    service: MarketDataService,
+    repository: MarketDataRepository,
+) -> None:
+    service.download_history(symbol="RELIANCE.NS", save=False)
+
+    assert repository.count() == 0
 
 
-def test_download_uses_repository_when_save_enabled(monkeypatch) -> None:
-    repository = StubRepository()
-    service = MarketDataService(repository=repository)
+def test_download_history_defaults_start_date_to_after_latest_stored_bar(
+    service: MarketDataService,
+    repository: MarketDataRepository,
+    fake_equity_provider: FakeEquityProvider,
+) -> None:
+    service.download_history(symbol="RELIANCE.NS", start_date="2025-01-01")
+    first_batch_count = repository.count()
 
-    monkeypatch.setattr(
-        ProviderFactory,
-        "get_provider",
-        lambda asset_type: StubProvider(),
-    )
+    # No explicit start_date this time - should resolve to the day after
+    # the latest stored bar instead of re-downloading from scratch.
+    service.download_history(symbol="RELIANCE.NS")
 
-    result = service.download(symbol="RELIANCE.NS")
-
-    assert len(result) == 1
-    assert repository.saved_frame is not None
-    assert repository.saved_frame["symbol"].tolist() == ["RELIANCE.NS"]
+    history = repository.get_history(symbol="RELIANCE.NS", asset_type="equity")
+    assert len(history) > first_batch_count
 
 
-def test_download_skips_repository_when_save_disabled(monkeypatch) -> None:
-    repository = StubRepository()
-    service = MarketDataService(repository=repository)
+def test_get_history_returns_persisted_rows_without_calling_provider(
+    service: MarketDataService,
+) -> None:
+    service.download_history(symbol="RELIANCE.NS", start_date="2025-01-01")
 
-    monkeypatch.setattr(
-        ProviderFactory,
-        "get_provider",
-        lambda asset_type: StubProvider(),
-    )
+    history = service.get_history(symbol="RELIANCE.NS")
 
-    service.download(symbol="RELIANCE.NS", save=False)
-
-    assert repository.saved_frame is None
+    assert len(history) > 0
+    assert history["symbol"].unique().tolist() == ["RELIANCE.NS"]

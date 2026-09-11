@@ -1,0 +1,54 @@
+# Environments
+.env
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Tooling caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# Data / runtime artifacts
+data/raw/*
+data/processed/*
+data/proceessed/*
+data/cache/*
+data/journal_screenshots/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/cache/.gitkeep
+!data/journal_screenshots/.gitkeep
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+logs/*.log
+logs/*.log.*
+
+# Ad-hoc script output (e.g. scripts/capture_dashboard_screenshot.py)
+scripts/*.png
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
