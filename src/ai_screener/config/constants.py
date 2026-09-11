@@ -1,0 +1,7 @@
+APP_NAME = "AI Screener"
+
+DATE_FORMAT = "%Y-%m-%d"
+
+DEFAULT_TIMEOUT = 30
+
+DEFAULT_TIMEZONE = "Asia/Kolkata"
